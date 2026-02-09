@@ -1,2 +1,2 @@
 # embedded-linux
-Labs for embedded systems class on a RPi Zero 2w.
+Labs for ECE4375L on a RPi Zero 2w.
