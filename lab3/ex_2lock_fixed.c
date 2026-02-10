@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
-#include <time.h>
 
 static pthread_mutex_t mutex1;
 static pthread_mutex_t mutex2;
@@ -10,19 +9,8 @@ static pthread_t t1;
 static pthread_t t2;
 static pthread_t main_id;
 
-static void computeTimeout(struct timespec* ts, long ms) {
-	clock_gettime(CLOCK_REALTIME, ts);
-	ts->tv_sec += ms / 1000;
-	ts->tv_nsec += (ms % 1000) * 1000000;
-	if (ts->tv_nsec >= 1000000000) {
-		ts->tv_sec++;
-		ts->tv_nsec -= 1000000000;
-	}
-}
-
 static void* bodyA(void* p) {
 	
-	/*
 	printf("Entered bodyA\n");
 	pthread_mutex_lock(&mutex1);
 	printf("Entered mutex1 in bodyA\n");
@@ -42,63 +30,29 @@ static void* bodyA(void* p) {
 	for (int i = 0; i < 1000000; ++i) { ++counter; }
 
 	return p;
-	*/
-	printf("Entered bodyA\n");
-	while (1) {
-		pthread_mutex_lock(&mutex1);
-		printf("Entered mutex1 in bodyA\n");
-		int counter = 0;
-		for (int i = 0; i < 1000000; ++i) { ++counter; }
-		struct timespec ts;
-		computeTimeout(&ts, 1000);
-		if (pthread_mutex_timedlock(&mutex2, &ts) == 0) {
-			printf("Entered mutex2 in bodyA\n");
-			counter = 0;
-			for (int i = 0; i < 1000000; ++i) { ++counter; }
-			pthread_mutex_unlock(&mutex2);
-			printf("Exited mutex2 in bodyA\n");
-			counter = 0;
-			for (int i = 0; i < 1000000; ++i) { ++counter; }
-			pthread_mutex_unlock(&mutex1);
-			printf("Exited mutex1 in bodyA\nbodyA success\n");
-			break;
-		}
-		printf("mutex2 lock timeout in bodyA\n");
-		pthread_mutex_unlock(&mutex1);
-		printf("Exited mutex1 in bodyA\nRestarting bodyA\n");
-		counter = 0; 
-		for (int i = 0; i < 1000000; ++i) { ++counter; }
-	}
-	return p;
+
 }
 
 static void* bodyB(void* p) {
+
 	printf("Entered bodyB\n");
-	while (1) {
-		pthread_mutex_lock(&mutex2);
-		printf("Entered mutex2 in bodyB\n");
-		int counter = 0;
-		for (int i = 0; i < 1000000; ++i) { ++counter; }
-		struct timespec ts;
-		computeTimeout(&ts, 1000);
-		if (pthread_mutex_timedlock(&mutex1, &ts) == 0) {
-			printf("Entered mutex1 in bodyB\n");
-			counter = 0;
-			for (int i = 0; i < 1000000; ++i) { ++counter; }
-			pthread_mutex_unlock(&mutex1);
-			printf("Exited mutex1 in bodyB\n");
-			counter = 0;
-			for (int i = 0; i < 1000000; ++i) { ++counter; }
-			pthread_mutex_unlock(&mutex2);
-			printf("Exited mutex2 in bodyB\nbodyB success\n");
-			break;
-		}
-		printf("mutex1 lock timeout in bodyB\n");
-		pthread_mutex_unlock(&mutex2);
-		printf("Exited mutex2 in bodyB\nRestarting bodyB\n");
-		counter = 0; 
-		for (int i = 0; i < 1000000; ++i) { ++counter; }
-	}
+	pthread_mutex_lock(&mutex1);
+	printf("Entered mutex1 in bodyB\n");
+	int counter = 0;
+	for (int i = 0; i < 1000000; ++i) { ++counter; }
+	pthread_mutex_lock(&mutex2);
+	printf("Entered mutex2 in bodyB\n");
+	counter = 0;
+	for (int i = 0; i < 1000000; ++i) { ++counter; }
+	pthread_mutex_unlock(&mutex2);
+	printf("Exited mutex2 in bodyB\n");
+	counter = 0;
+	for (int i = 0; i < 1000000; ++i) { ++counter; }
+	pthread_mutex_unlock(&mutex1);
+	printf("Exited mutex1 in bodyB\n");
+	counter = 0; 
+	for (int i = 0; i < 1000000; ++i) { ++counter; }
+
 	return p;
 
 }
