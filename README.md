@@ -12,4 +12,3 @@ Labs for ECE4375L on a RPi Zero 2w.
 | Lab 7 | Managing I/O |
 | Lab 8 | Embedded Systems and Python |
 | Lab 9 | Practical exam |
-
