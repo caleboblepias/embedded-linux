@@ -1,6 +1,7 @@
 # embedded-linux
 Labs for ECE4375L on a RPi Zero 2w.
 
+| Lab # | Content |
 |----------|----------|
 | Lab 1 | Setup, compilation, and debugging |
 | Lab 2 | Thread creation and control |
